@@ -96,8 +96,8 @@ qav::scr_size qav::qvideo::get_size(void) const {
 }
 
 int qav::qvideo::get_fps_k(void) const {
-	if (pFormatCtx->streams[videoStream]->r_frame_rate.den)
-		return 1000*pFormatCtx->streams[videoStream]->r_frame_rate.num/pFormatCtx->streams[videoStream]->r_frame_rate.den;
+	if (pFormatCtx->streams[videoStream]->avg_frame_rate.den)
+		return 1000*pFormatCtx->streams[videoStream]->avg_frame_rate.num/pFormatCtx->streams[videoStream]->avg_frame_rate.den;
 	return 0;
 }
 
