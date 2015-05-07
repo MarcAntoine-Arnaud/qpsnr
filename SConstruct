@@ -5,34 +5,34 @@ qpsnrVersionMinor = "2"
 qpsnrVersionMicro = "1"
 
 qpsnrVersion = [
-    qpsnrVersionMajor,
-    qpsnrVersionMinor,
-    qpsnrVersionMicro ]
+	qpsnrVersionMajor,
+	qpsnrVersionMinor,
+	qpsnrVersionMicro ]
 
 qpsnrVersionStr = ".".join( qpsnrVersion )
 
 buildMode = ARGUMENTS.get( 'mode', 'release' )
 if not ( buildMode in [ 'debug', 'release' ] ) :
-        raise Exception( "Can't select build mode ['debug', 'release']" )
+		raise Exception( "Can't select build mode ['debug', 'release']" )
 
 env = Environment()
 
 env.Append(
-        CPPPATH = [
-                '#src',
-        ],
-        CXXFLAGS = [
-                '-Wall',
-                '-fPIC',
-                '-DQPSNR_VERSION_MAJOR=' + qpsnrVersionMajor,
-                '-DQPSNR_VERSION_MINOR=' + qpsnrVersionMinor,
-                '-DQPSNR_VERSION_MICRO=' + qpsnrVersionMicro,
-        ],
-        LIBPATH = [
-                '#src'
-        ],
-        SHLIBVERSION = qpsnrVersionStr,
-        )
+		CPPPATH = [
+				'#src',
+		],
+		CXXFLAGS = [
+				'-Wall',
+				'-fPIC',
+				'-DQPSNR_VERSION_MAJOR=' + qpsnrVersionMajor,
+				'-DQPSNR_VERSION_MINOR=' + qpsnrVersionMinor,
+				'-DQPSNR_VERSION_MICRO=' + qpsnrVersionMicro,
+		],
+		LIBPATH = [
+				'#src'
+		],
+		SHLIBVERSION = qpsnrVersionStr,
+		)
 
 
 Export( 'env' )
