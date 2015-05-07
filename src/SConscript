@@ -14,6 +14,10 @@ if not conf.CheckLibWithHeader('avformat', 'libavformat/avformat.h', 'c'):
     print 'Did not find libavformat.a or avformat.lib, exiting!'
     Exit(1)
 
+if not conf.CheckLibWithHeader('swscale', 'libswscale/swscale.h', 'c'):
+    print 'Did not find libswscale.a or swscale.lib, exiting!'
+    Exit(1)
+
 env = conf.Finish()
 
 qpsnrLib = env.SharedLibrary(
@@ -23,6 +27,7 @@ qpsnrLib = env.SharedLibrary(
     	"avutil",
     	"avcodec",
     	"avformat",
+    	"swscale",
     ],
 )
 
@@ -33,6 +38,7 @@ qpsnrLibStatic = env.StaticLibrary(
     	"avutil",
     	"avcodec",
     	"avformat",
+    	"swscale",
     ],
 )
 
