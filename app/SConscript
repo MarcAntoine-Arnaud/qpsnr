@@ -1,11 +1,12 @@
 
 import os
+import distutils.sysconfig
 Import( 'env' )
 
 Import( 'qpsnrLib' )
 Import( 'qpsnrLibStatic' )
 
-env.Program(
+qpsnrApp = env.Program(
 	'qpsnr',
 	Glob( '*.cpp' ),
 	LIBS = [
@@ -15,3 +16,8 @@ env.Program(
 		"avcodec",
 	]
 )
+
+installApp = env.Install( "bin", [ qpsnrApp ] )
+
+env.Alias( "install", installApp )
+env.Depends( installApp, qpsnrApp )
