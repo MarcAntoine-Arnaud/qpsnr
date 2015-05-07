@@ -1,4 +1,5 @@
 
+build
+.scon*
+config.log
 
-qpsnr
-obj/

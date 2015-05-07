@@ -31,15 +31,18 @@
 
 // define these classes just locally
 namespace stats {
-	static double compute_psnr(const unsigned char *ref, const unsigned char *cmp, const unsigned int& sz) {
+	static double compute_psnr(const unsigned char *ref, const unsigned char *cmp, const unsigned int& sz)
+	{
 		double mse = 0.0;
-		for(unsigned int i = 0; i < sz; ++i) {
-			const int	diff = ref[i]-cmp[i];
+		for(unsigned int i = 0; i < sz; ++i)
+		{
+			const int diff = ref[i]-cmp[i];
 			mse += (diff*diff);
 		}
 		mse /= (double)sz;
-		if (0.0 == mse) mse = 1e-10;
-		return 10.0*log10(65025.0/mse);
+		if (0.0 == mse)
+			mse = 1e-10;
+		return 10.0 * log10( 65025.0 / mse );
 	}
 
 	static double compute_ssim(const unsigned char *ref, const unsigned char *cmp, const unsigned int& x, const unsigned int& y, const unsigned int& b_sz) {
@@ -160,19 +163,28 @@ namespace stats {
 
 	static mt::ThreadPool	__stats_tp(getCPUcount());
 
-	class psnr_job : public mt::ThreadPool::Job {
-		const unsigned char	*_ref,
-					*_cmp;
-		const unsigned int	_sz;
-		double			&_res;
+	class psnr_job
+		: public mt::ThreadPool::Job
+	{
 	public:
-		psnr_job(const unsigned char *ref, const unsigned char *cmp, const unsigned int& sz, double& res) :
-		_ref(ref), _cmp(cmp), _sz(sz), _res(res) {
+		psnr_job(const unsigned char *ref, const unsigned char *cmp, const unsigned int& sz, double& res)
+			: mt::ThreadPool::Job("PSNR")
+			, _ref(ref)
+			, _cmp(cmp)
+			, _sz(sz)
+			, _res(res)
+		{
 		}
 
-		virtual void run(void) {
+		virtual void run(void)
+		{
 			_res = compute_psnr(_ref, _cmp, _sz);
 		}
+	private:
+		const unsigned char* _ref;
+		const unsigned char* _cmp;
+		const unsigned int _sz;
+		double &_res;
 	};
 
 	static void get_psnr_tp(const VUCHAR& ref, const std::vector<bool>& v_ok, const std::vector<VUCHAR>& streams, std::vector<double>& res) {
@@ -191,21 +203,37 @@ namespace stats {
 		}
 	}
 
-	class ssim_job : public mt::ThreadPool::Job {
-		const unsigned char	*_ref,
-					*_cmp;
-		const unsigned int	_x,
-					_y,
-					_b_sz;
-		double			&_res;
+	class ssim_job : public mt::ThreadPool::Job
+	{
 	public:
-		ssim_job(const unsigned char *ref, const unsigned char *cmp, const unsigned int& x, const unsigned int& y, const unsigned int b_sz, double& res) :
-		_ref(ref), _cmp(cmp), _x(x), _y(y), _b_sz(b_sz), _res(res) {
+		ssim_job(
+				const unsigned char *ref,
+				const unsigned char *cmp,
+				const unsigned int& x,
+				const unsigned int& y,
+				const unsigned int b_sz,
+				double& res )
+			: mt::ThreadPool::Job("SSIM")
+			, _ref(ref)
+			, _cmp(cmp)
+			, _x(x)
+			, _y(y)
+			, _b_sz(b_sz)
+			, _res(res)
+		{
 		}
 
-		virtual void run(void) {
+		virtual void run(void)
+		{
 			_res = compute_ssim(_ref, _cmp, _x, _y, _b_sz);
 		}
+	private:
+		const unsigned char* _ref;
+		const unsigned char* _cmp;
+		const unsigned int _x;
+		const unsigned int _y;
+		const unsigned int _b_sz;
+		double &_res;
 	};
 
 	static void get_ssim_tp(const VUCHAR& ref, const std::vector<bool>& v_ok, const std::vector<VUCHAR>& streams, std::vector<double>& res, const unsigned int& x, const unsigned int& y, const unsigned int& b_sz) {
@@ -224,43 +252,61 @@ namespace stats {
 		}
 	}
 
-	class hsi_job : public mt::ThreadPool::Job {
-		unsigned char		*_buf;
-		const unsigned int	_sz;
+	class hsi_job
+		: public mt::ThreadPool::Job
+	{
 	public:
-		hsi_job(unsigned char *buf, const unsigned int& sz) :
-		_buf(buf), _sz(sz) {
+		hsi_job(unsigned char *buf, const unsigned int& sz)
+			: mt::ThreadPool::Job("HSI")
+			, _buf(buf)
+			, _sz(sz)
+		{
 		}
 
-		virtual void run(void) {
+		virtual void run(void)
+		{
 			rgb_2_hsi(_buf, _sz);
 		}
+	private:
+		unsigned char *_buf;
+		const unsigned int _sz;
 	};
 
-	class YCbCr_job : public mt::ThreadPool::Job {
-		unsigned char		*_buf;
-		const unsigned int	_sz;
+	class YCbCr_job : public mt::ThreadPool::Job
+	{
 	public:
-		YCbCr_job(unsigned char *buf, const unsigned int& sz) :
-		_buf(buf), _sz(sz) {
+		YCbCr_job(unsigned char *buf, const unsigned int& sz)
+			: mt::ThreadPool::Job("YCbCr")
+			, _buf(buf)
+			, _sz(sz)
+		{
 		}
 
-		virtual void run(void) {
+		virtual void run(void)
+		{
 			rgb_2_YCbCr(_buf, _sz);
 		}
+	private:
+		unsigned char* _buf;
+		const unsigned int _sz;
 	};
 
 	class Y_job : public mt::ThreadPool::Job {
-		unsigned char		*_buf;
-		const unsigned int	_sz;
 	public:
-		Y_job(unsigned char *buf, const unsigned int& sz) :
-		_buf(buf), _sz(sz) {
+		Y_job(unsigned char *buf, const unsigned int& sz)
+			: mt::ThreadPool::Job("Y")
+			, _buf(buf)
+			, _sz(sz)
+		{
 		}
 
-		virtual void run(void) {
+		virtual void run(void)
+		{
 			rgb_2_Y(_buf, _sz);
 		}
+	private:
+		unsigned char* _buf;
+		const unsigned int _sz;
 	};
 
 	static void rgb_2_hsi_tp(VUCHAR& ref, const std::vector<bool>& v_ok, std::vector<VUCHAR>& streams) {
@@ -318,7 +364,6 @@ namespace stats {
 	}
 
 	class psnr : public s_base {
-		std::string	_colorspace;
 	protected:
 		void print(const int& ref_frame, const std::vector<double>& v_res) {
 			
@@ -330,7 +375,8 @@ namespace stats {
 			_ostr << std::endl;*/
 		}
 
-		void process_colorspace(VUCHAR& ref, const std::vector<bool>& v_ok, std::vector<VUCHAR>& streams) {
+		void process_colorspace(VUCHAR& ref, const std::vector<bool>& v_ok, std::vector<VUCHAR>& streams)
+		{
 			if (_colorspace == "hsi") {
 				rgb_2_hsi_tp(ref, v_ok, streams);
 			} else if (_colorspace == "ycbcr") {
@@ -340,8 +386,10 @@ namespace stats {
 			}
 		}
 	public:
-		psnr(const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
-		s_base(n_streams, i_width, i_height, ostr), _colorspace("rgb") {
+		psnr(const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr)
+		: s_base(n_streams, i_width, i_height, ostr)
+		, _colorspace("rgb")
+		{
 		}
 
 		virtual void set_parameter(const std::string& p_name, const std::string& p_value) {
@@ -363,6 +411,9 @@ namespace stats {
 			//
 			print(ref_frame, v_res);
 		}
+
+	private:
+		std::string	_colorspace;
 	};
 
 	class avg_psnr : public psnr {
@@ -531,7 +582,13 @@ namespace stats {
 	};
 }
 
-stats::s_base* stats::get_analyzer(const char* id, const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) {
+stats::s_base* stats::get_analyzer(
+	const char* id,
+	const int& n_streams,
+	const int& i_width,
+	const int& i_height,
+	std::ostream& ostr )
+{
 	const std::string	s_id(id);
 	if (s_id == "psnr") return new psnr(n_streams, i_width, i_height, ostr);
 	else if (s_id == "avg_psnr") return new avg_psnr(n_streams, i_width, i_height, ostr);

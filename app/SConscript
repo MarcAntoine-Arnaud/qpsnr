@@ -1,0 +1,17 @@
+
+import os
+Import( 'env' )
+
+Import( 'qpsnrLib' )
+Import( 'qpsnrLibStatic' )
+
+env.Program(
+	'qpsnr',
+	Glob( '*.cpp' ),
+	LIBS = [
+		qpsnrLib,
+		"avutil",
+		"avformat",
+		"avcodec",
+	]
+)

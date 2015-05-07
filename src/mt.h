@@ -28,40 +28,56 @@
 #include <exception>
 #include <string>
 
+#include <iostream>
+
 namespace mt {
 
-	class mt_exception : public std::exception {
-		const std::string	_what;
+	class mt_exception : public std::exception
+	{
 	public:
-		mt_exception(const std::string& what) : _what(what) {
+		mt_exception(const std::string& what)
+			: _what(what)
+		{
 		}
 
-		virtual const char* what() const throw() {
+		virtual const char* what() const throw()
+		{
 			return _what.c_str();
 		}
 
-		~mt_exception() throw () {
+		~mt_exception() throw ()
+		{
 		}
+	private:
+		const std::string	_what;
 	};
 
-	class Semaphore {
-		sem_t	_sem;
-
+	class Semaphore
+	{
 		Semaphore(const Semaphore&);
 		Semaphore& operator=(const Semaphore&);
 	public:
-		Semaphore() {
-			if (0 != sem_init(&_sem, 0, 1))
-				throw mt_exception("Semaphore: Semaphore()");
+		Semaphore(const std::string& name)
+		{
+			_sem = sem_open( name.c_str(), O_CREAT, 777, 777 );
+			if ((void*)_sem == SEM_FAILED)
+			{
+				throw mt_exception("Semaphore: Unable to create semaphore()");
+			}
+			//std::cout << "create Semaphore " << name << " " << _sem << std::endl;
 		}
 
-		void push(void) {
-			if (0 != sem_wait(&_sem))
+		void push(void)
+		{
+
+			//std::cout << "PUSH Semaphore" << std::endl;
+			if (0 != sem_wait(_sem))
 				throw mt_exception("Sempahore: push");
 		}
 
-		bool trypush(void) {
-			if (0 == sem_trywait(&_sem)) {
+		bool trypush(void)
+		{
+			if (0 == sem_trywait(_sem)) {
 				return true;
 			} else if (errno == EAGAIN) {
 				return false;
@@ -69,14 +85,21 @@ namespace mt {
 			throw mt_exception("Semaphore: trywait");
 		}
 
-		void pop(void) {
-			if (0 != sem_post(&_sem))
+		void pop(void)
+		{
+			//std::cout << "POP Semaphore" << std::endl;
+			if (0 != sem_post(_sem))
 				throw mt_exception("Sempahore: pop");
 		}
 		
-		~Semaphore() {
-			sem_destroy(&_sem);
+		~Semaphore()
+		{
+			//std::cout << "delete " << std::endl;
+			//sem_destroy(_sem);
+			sem_close(_sem);
 		}
+	private:
+		sem_t* _sem;
 	};
 
 	class Mutex {
@@ -153,15 +176,17 @@ namespace mt {
 		}
 	};
 
-	class ThreadPool {
+	class ThreadPool
+	{
 	public:
-		class Job {
-			friend	class	ThreadPool;
-			Semaphore	_sem;
-			volatile bool	_on_hold;
-			const bool	_to_be_deleted;
+		class Job
+		{
 		public:
-			Job(const bool& to_be_deleted = false) : _on_hold(true), _to_be_deleted(to_be_deleted) {
+			Job(const std::string& name, const bool& to_be_deleted = false)
+				: _sem( name )
+				, _on_hold(true)
+				, _to_be_deleted(to_be_deleted)
+			{
 				_sem.push();
 			}
 
@@ -178,12 +203,14 @@ namespace mt {
 
 			// We pop the semaphore again in case someone else
 			// will ask to wait again...
-			void wait(void) {
+			void wait(void)
+			{
 				_sem.push();
 				_sem.pop();
 			};
 
-			bool is_running(void) {
+			bool is_running(void)
+			{
 				if (_on_hold) return false;
 				if (false == _sem.trypush())
 					return true;
@@ -191,20 +218,17 @@ namespace mt {
 				return false;
 			}
 
-			virtual ~Job() {
+			virtual ~Job()
+			{
 			}
+
+		private:
+			friend class ThreadPool;
+			Semaphore _sem;
+			volatile bool _on_hold;
+			const bool _to_be_deleted;
 		};
 	private:
-		Mutex		_list_mtx;
-		Semaphore	_list_sem;
-		std::list<Job*>	_list_jobs;
-
-		// the following variable is not mutex
-		// protected because is sort of write-only
-		// by main ThreadPool thread, see destructor
-		volatile bool		_tp_quit;
-		const unsigned int	_n_execs;
-		std::vector<pthread_t>	_th_ids;
 
 		bool get_job(Job** _job) {
 			ScopedLock _sl(_list_mtx);
@@ -219,25 +243,32 @@ namespace mt {
 		// Technically we should declare it as extern "C" but we
 		// don't care as seen as the function pointer will correspond
 		// to a proper C-like function even if the name will be C++ like
-		static void* job_exec(void* par) throw() {
-			try {
+		static void* job_exec(void* par) throw()
+		{
+			try
+			{
 				ThreadPool *p = (ThreadPool*)par;
-				while(true) {
+				while(true)
+				{
 					// first push on the semaphore
 					p->_list_sem.push();
 					// check if we have to quit
 					if (p->_tp_quit) return 0;
 					// get an element to process
 					Job	*curJob = 0;
-					if (p->get_job(&curJob)) {
+					if (p->get_job(&curJob))
+					{
 						// we need to save the delete_job varibale because
 						// after the semaphore has been popped the object 
 						// could not exist anymore
 						const bool delete_job = curJob->_to_be_deleted;
-						try {
+						try
+						{
 							curJob->_on_hold = false;
 							curJob->run();
-						} catch(...) {
+						}
+						catch(...)
+						{
 						}
 						// if the following instruction throws is better 
 						// to let the user know because this means that
@@ -250,7 +281,9 @@ namespace mt {
 					// check if we have to quit
 					if (p->_tp_quit) return 0;
 				}
-			} catch(...) {
+			}
+			catch(...)
+			{
 			}
 			return 0;
 		}
@@ -261,25 +294,33 @@ namespace mt {
 		// Just take into account that semaphores are not syscall immune
 		// so when you run in debug mode you can have exceptions thrown on
 		// push because of system interrruption! Don't get scared!
-		ThreadPool(const unsigned int& n_execs) : _tp_quit(false), _n_execs(n_execs), _th_ids(n_execs) {
+		ThreadPool(const unsigned int& n_execs)
+			: _list_sem( "ThreadPool")
+			, _tp_quit(false)
+			, _n_execs(n_execs)
+			, _th_ids(n_execs)
+		{
 			if (_n_execs == 0 || _n_execs > 256)
 				throw mt_exception("ThreadPool: invalid number of n_execs");
 			// create the job_exec threads
 			for (unsigned int i = 0; i < _n_execs; ++i)
-				if (0 != pthread_create(&_th_ids[i], NULL, &job_exec, this)) {
+				if (0 != pthread_create(&_th_ids[i], NULL, &job_exec, this))
+				{
 					for (unsigned int j=0; j < i; ++j)
 						pthread_cancel(_th_ids[j]);
 					throw mt_exception("ThreadPool: could not start all specified n_execs");
 				}
 		}
 
-		void add(Job* job) {
+		void add(Job* job)
+		{
 			ScopedLock _sl(_list_mtx);
 			_list_jobs.push_back(job);
 			_list_sem.pop();
 		}
 
-		~ThreadPool() {
+		~ThreadPool()
+		{
 			_tp_quit = true;
 			for (unsigned int i = 0; i < _n_execs; ++i)
 				_list_sem.pop();
@@ -288,8 +329,25 @@ namespace mt {
 			// potentialy unsafe...this could throw...but should never...
 			ScopedLock _sl(_list_mtx);
 			for (std::list<Job*>::iterator it = _list_jobs.begin(); it != _list_jobs.end(); ++it)
-				if ((*it)->_to_be_deleted) delete *it;
+			{
+				if ((*it)->_to_be_deleted)
+				{
+					delete *it;
+				}
+			}
 		}
+
+	private:
+		Mutex		_list_mtx;
+		Semaphore	_list_sem;
+		std::list<Job*>	_list_jobs;
+
+		// the following variable is not mutex
+		// protected because is sort of write-only
+		// by main ThreadPool thread, see destructor
+		volatile bool		_tp_quit;
+		const unsigned int	_n_execs;
+		std::vector<pthread_t>	_th_ids;
 	};
 }
 
