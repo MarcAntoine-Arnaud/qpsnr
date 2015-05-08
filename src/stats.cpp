@@ -366,13 +366,10 @@ namespace stats {
 	class psnr : public s_base {
 	protected:
 		void print(const int& ref_frame, const std::vector<double>& v_res) {
-			
+			_ostr << "<frame index=" << ref_frame << ">";
 			for(int i = 0; i < _n_streams; ++i)
-				_ostr << "d" << i << ".push([" << ref_frame << ", " << v_res[i] << "]);" << std::endl;
-			/*_ostr << ref_frame << ',';
-			for(int i = 0; i < _n_streams; ++i)
-				_ostr << v_res[i] << ',';
-			_ostr << std::endl;*/
+				_ostr << "<result>" << v_res[i] << "</result>";
+			_ostr << "</frame>" << std::endl;
 		}
 
 		void process_colorspace(VUCHAR& ref, const std::vector<bool>& v_ok, std::vector<VUCHAR>& streams)
@@ -485,13 +482,10 @@ namespace stats {
 		int	_blocksize;
 
 		void print(const int& ref_frame, const std::vector<double>& v_res) {
+			_ostr << "<frame index=" << ref_frame << ">";
 			for(int i = 0; i < _n_streams; ++i)
-				_ostr << "d" << i << ".push([" << ref_frame << ", " << v_res[i] << "]);" << std::endl;
-			/*
-			_ostr << ref_frame << ',';
-			for(int i = 0; i < _n_streams; ++i)
-				_ostr << v_res[i] << ',';
-			_ostr << std::endl;*/
+				_ostr << "<result>" << v_res[i] << "</result>";
+			_ostr << "</frame>" << std::endl;
 		}
 	public:
 		ssim(const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
