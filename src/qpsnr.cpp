@@ -6,9 +6,11 @@
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
-Qpsnr::Qpsnr(const std::string& reference, const size_t width, const size_t height)
-	: _referenceVideo( reference.c_str(), width, height )
+Qpsnr::Qpsnr(const std::string& outputFilename, const std::string& reference, const size_t width, const size_t height)
+	: _outputFile( outputFilename.c_str(), std::ofstream::out )
+	, _referenceVideo( reference.c_str(), width, height )
 	, _analyzer ( NULL )
 	, _width( width )
 	, _height( height )
@@ -49,7 +51,7 @@ void Qpsnr::initAnalyser( const std::string& analyser, const std::map<std::strin
 		_videos.size(),
 		referenceSize.x,
 		referenceSize.y,
-		std::cout );
+		_outputFile );
 
 	// set the default values, in case will get overwritten
 	std::ostringstream oss;

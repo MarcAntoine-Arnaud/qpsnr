@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 		if (settings::REF_VIDEO == "")
 			throw std::runtime_error("Reference video not specified");
 		
-		Qpsnr comparator( settings::REF_VIDEO.c_str(), settings::VIDEO_SIZE_W, settings::VIDEO_SIZE_H );
+		Qpsnr comparator( "result.xml", settings::REF_VIDEO.c_str(), settings::VIDEO_SIZE_W, settings::VIDEO_SIZE_H );
 
 		for(int i = param; i < argc; ++i)
 		{

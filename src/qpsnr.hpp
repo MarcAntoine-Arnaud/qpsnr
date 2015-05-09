@@ -7,12 +7,13 @@
 
 #include <vector>
 #include <map>
+#include <fstream>
 
 class Qpsnr
 {
 
 public:
-	Qpsnr(const std::string& reference, const size_t width, const size_t height);
+	Qpsnr(const std::string& outputFilename, const std::string& reference, const size_t width, const size_t height);
 	~Qpsnr();
 
 	void addVideo( const std::string& video );
@@ -23,6 +24,8 @@ public:
 	void process();
 
 private:
+	std::ofstream _outputFile;
+	
 	qav::qvideo	_referenceVideo;
 	std::vector<qav::qvideo*> _videos;
 
