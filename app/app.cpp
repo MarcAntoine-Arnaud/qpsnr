@@ -75,25 +75,32 @@ int parse_options(int argc, char *argv[], std::map<std::string, std::string>& ao
 	while ((c = getopt_long (argc, argv, "a:l:m:o:r:s:v:hIG", long_options, &option_index)) != -1) {
 		switch (c) {
 			case 'a':
+			{
 				settings::ANALYZER = optarg;
 				break;
+			}
 			case 'v':
-				{
-					const char *p_x = strchr(optarg, 'x');
-					if (!p_x) p_x = strchr(optarg, 'X');
-					if (!p_x) throw std::runtime_error("Invalid video size specified (use WIDTHxHEIGHT format, ie. 1280x720)");
-					const std::string	s_x(optarg, p_x-optarg),
-								s_y(p_x+1);
-					if (s_x.empty() || s_y.empty())
-						throw std::runtime_error("Invalid video size specified (use WIDTHxHEIGHT format, ie. 1280x720)");
-					const int		i_x = atoi(s_x.c_str()),
-								i_y = atoi(s_y.c_str());
-					if (i_x <=0 || i_y <=0)
-						throw std::runtime_error("Invalid video size specified, negative or 0 width/height");
-					settings::VIDEO_SIZE_W = i_x;
-					settings::VIDEO_SIZE_H = i_y;
-				}
+			{
+				const char *p_x = strchr(optarg, 'x');
+				if (!p_x)
+					p_x = strchr(optarg, 'X');
+				if (!p_x)
+					throw std::runtime_error("Invalid video size specified (use WIDTHxHEIGHT format, ie. 1280x720)");
+				const std::string s_x(optarg, p_x-optarg);
+				const std::string s_y(p_x+1);
+				if (s_x.empty() || s_y.empty())
+					throw std::runtime_error("Invalid video size specified (use WIDTHxHEIGHT format, ie. 1280x720)");
+				
+				const int i_x = atoi(s_x.c_str());
+				const int i_y = atoi(s_y.c_str());
+				if (i_x <=0 || i_y <=0)
+					throw std::runtime_error("Invalid video size specified, negative or 0 width/height");
+
+				settings::VIDEO_SIZE_W = i_x;
+				settings::VIDEO_SIZE_H = i_y;
+				
 				break;
+			}
 			case 's':
 				{
 					const int skip_frames = atoi(optarg);
@@ -101,14 +108,17 @@ int parse_options(int argc, char *argv[], std::map<std::string, std::string>& ao
 				}
 				break;
 			case 'r':
+			{
 				settings::REF_VIDEO = optarg;
 				break;
+			}
 			case 'm':
-				{
-					const int max_frames = atoi(optarg);
-					if (max_frames > 0 ) settings::MAX_FRAMES = max_frames;
-				}
+			{
+				const int max_frames = atoi(optarg);
+				if (max_frames > 0 )
+					settings::MAX_FRAMES = max_frames;
 				break;
+			}
 			case 'l':
 				if (isdigit(optarg[0])) {
 					char log_level[2];
