@@ -342,8 +342,8 @@ namespace stats {
 			}
 		}
 	public:
-		psnr(const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr)
-		: s_base(n_streams, i_width, i_height, ostr)
+		psnr(const char* analyseType, const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr)
+		: s_base(analyseType, n_streams, i_width, i_height, ostr)
 		, _colorspace("rgb")
 		{
 		}
@@ -397,8 +397,8 @@ namespace stats {
 			_accum_f = 0;
 		}
 	public:
-		avg_psnr(const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
-		psnr(n_streams, i_width, i_height, ostr), _fpa(1), _accum_f(0), _last_frame(-1), _accum_v(n_streams) {
+		avg_psnr(const char* analyseType, const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
+		psnr(analyseType, n_streams, i_width, i_height, ostr), _fpa(1), _accum_f(0), _last_frame(-1), _accum_v(n_streams) {
 		}
 
 		virtual void set_parameter(const std::string& p_name, const std::string& p_value) {
@@ -453,8 +453,8 @@ namespace stats {
 			_ostr << "</frame>" << std::endl;
 		}
 	public:
-		ssim(const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
-		s_base(n_streams, i_width, i_height, ostr), _blocksize(8) {
+		ssim(const char* analyseType, const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
+		s_base(analyseType, n_streams, i_width, i_height, ostr), _blocksize(8) {
 		}
 
 		virtual void set_parameter(const std::string& p_name, const std::string& p_value) {
@@ -495,8 +495,8 @@ namespace stats {
 			_accum_f = 0;
 		}
 	public:
-		avg_ssim(const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
-		ssim(n_streams, i_width, i_height, ostr), _fpa(1), _accum_f(0), _last_frame(-1), _accum_v(n_streams) {
+		avg_ssim(const char* analyseType, const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
+		ssim(analyseType, n_streams, i_width, i_height, ostr), _fpa(1), _accum_f(0), _last_frame(-1), _accum_v(n_streams) {
 		}
 
 		virtual void set_parameter(const std::string& p_name, const std::string& p_value) {
@@ -549,9 +549,9 @@ stats::s_base* stats::get_analyzer(
 	std::ostream& ostr )
 {
 	const std::string	s_id(id);
-	if (s_id == "psnr") return new psnr(n_streams, i_width, i_height, ostr);
-	else if (s_id == "avg_psnr") return new avg_psnr(n_streams, i_width, i_height, ostr);
-	else if (s_id == "ssim") return new ssim(n_streams, i_width, i_height, ostr);
-	else if (s_id == "avg_ssim") return new avg_ssim(n_streams, i_width, i_height, ostr);
+	if (s_id == "psnr") return new psnr(id, n_streams, i_width, i_height, ostr);
+	else if (s_id == "avg_psnr") return new avg_psnr(id, n_streams, i_width, i_height, ostr);
+	else if (s_id == "ssim") return new ssim(id, n_streams, i_width, i_height, ostr);
+	else if (s_id == "avg_ssim") return new avg_ssim(id, n_streams, i_width, i_height, ostr);
 	throw std::runtime_error("Invalid analyzer id");
 }

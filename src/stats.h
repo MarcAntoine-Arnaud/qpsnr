@@ -35,12 +35,13 @@ namespace stats {
 		const int _i_height;
 		std::ostream &_ostr;
 	public:
-		s_base(const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr)
+		s_base(const char* analyseType, const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr)
 			: _n_streams(n_streams)
 			, _i_width(i_width)
 			, _i_height(i_height)
 			, _ostr(ostr)
 		{
+			_ostr << "<analyse type=" << analyseType << ">" << std::endl;
 		}
 
 		virtual void set_parameter(const std::string& p_name, const std::string& p_value) = 0;
@@ -52,6 +53,7 @@ namespace stats {
 			std::vector<VUCHAR>& streams) = 0;
 
 		virtual ~s_base() {
+			_ostr << "</analyse>" << std::endl;
 		}
 	};
 
