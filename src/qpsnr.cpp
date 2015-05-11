@@ -58,8 +58,9 @@ void Qpsnr::initAnalyser( const std::string& analyser, const std::map<std::strin
 	_analyzer->set_parameter("fpa", oss.str());
 	_analyzer->set_parameter("blocksize", "8");
 	// load the passed parameters
-	for(std::map<std::string, std::string>::const_iterator it = options.begin(); it != options.end(); ++it) {
-		LOG_INFO << "Analyzer parameter: " << it->first << " = " << it->second << std::endl;
+	for(std::map<std::string, std::string>::const_iterator it = options.begin(); it != options.end(); ++it)
+	{
+		LOG_ERROR << "Analyzer parameter: " << it->first << " = " << it->second << std::endl;
 		_analyzer->set_parameter(it->first.c_str(), it->second.c_str());
 	}
 }
@@ -93,6 +94,10 @@ void Qpsnr::process()
 	while(1)
 	{
 		size_t processedFrameIndex = processFrame();
-		std::cout << "\r Process frame " << processedFrameIndex << std::flush;
+		std::cerr << "\r Process frame " << processedFrameIndex << std::flush;
+		if( processedFrameIndex == settings::MAX_FRAMES )
+		{
+			break;
+		}
 	}
 }
