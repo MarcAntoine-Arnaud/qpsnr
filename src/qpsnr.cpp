@@ -66,7 +66,7 @@ void Qpsnr::initAnalyser( const std::string& analyser, const std::map<std::strin
 	}
 }
 
-void Qpsnr::processFrame()
+size_t Qpsnr::processFrame()
 {
 	bool skip = false;
 	int frameNumber = 0;
@@ -87,12 +87,14 @@ void Qpsnr::processFrame()
 			v_ok,
 			videoFrameBuffer
 	);
+	return frameNumber;
 }
 
 void Qpsnr::process()
 {
 	while(1)
 	{
-		processFrame();
+		size_t processedFrameIndex = processFrame();
+		std::cout << "\r Process frame " << processedFrameIndex << std::flush;
 	}
 }

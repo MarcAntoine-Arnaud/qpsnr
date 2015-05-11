@@ -20,7 +20,7 @@ public:
 
 	void initAnalyser( const std::string& analyser, const std::map<std::string, std::string>& options );
 
-	void processFrame();
+	size_t processFrame();
 	void process();
 
 private:
