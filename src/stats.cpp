@@ -191,15 +191,8 @@ namespace stats {
 		const unsigned int 			sz = v_ok.size();
 		std::vector<shared_ptr<psnr_job> >	v_jobs;
 		for(unsigned int i =0; i < sz; ++i) {
-			if (v_ok[i]) {
-				v_jobs.push_back(new psnr_job(&ref[0], &(streams[i][0]), ref.size(), res[i]));
-				__stats_tp.add(v_jobs.rbegin()->get());
-			} else res[i] = 0.0;
-		}
-		//wait for all
-		for(std::vector<shared_ptr<psnr_job> >::iterator it = v_jobs.begin(); it != v_jobs.end(); ++it) {
-			(*it)->wait();
-			(*it) = 0;
+			psnr_job* job = new psnr_job(&ref[0], &(streams[i][0]), ref.size(), res[i]);
+			job->run();
 		}
 	}
 
@@ -398,8 +391,14 @@ namespace stats {
 			}
 		}
 
-		virtual void process(const int& ref_frame, VUCHAR& ref, const std::vector<bool>& v_ok, std::vector<VUCHAR>& streams) {
-			if (v_ok.size() != streams.size() || v_ok.size() != (unsigned int)_n_streams) throw std::runtime_error("Invalid data size passed to analyzer");
+		virtual void process(const int& ref_frame, VUCHAR& ref, const std::vector<bool>& v_ok, std::vector<VUCHAR>& streams)
+		{
+			if ( v_ok.size() != streams.size() ||
+				 v_ok.size() != (unsigned int)_n_streams )
+			{
+				throw std::runtime_error("Invalid data size passed to analyzer");
+			}
+
 			// process colorspace
 			process_colorspace(ref, v_ok, streams);
 			//
