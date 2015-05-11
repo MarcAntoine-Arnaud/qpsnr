@@ -22,19 +22,30 @@
 #include <stdexcept>
 #include <sstream>
 
-qav::qvideo::qvideo(const char* file, int _out_width, int _out_height) : frnum(0), videoStream(-1), out_width(_out_width),
-out_height(_out_height), pFormatCtx(NULL), pCodecCtx(NULL), pCodec(NULL), pFrame(NULL), img_convert_ctx(NULL) {
+qav::qvideo::qvideo(const char* file, int _out_width, int _out_height)
+	: frnum(0)
+	, videoStream(-1)
+	, out_width(_out_width)
+	, out_height(_out_height)
+	, pFormatCtx(NULL)
+	, pCodecCtx(NULL)
+	, pCodec(NULL)
+	, pFrame(NULL)
+	, img_convert_ctx(NULL)
+{
 	const char* pslash = strrchr(file, '/');
 	if (pslash)
 		fname = pslash+1;
 	else
 		fname = file;
 
-	if (avformat_open_input(&pFormatCtx, file, NULL, NULL) < 0) {
+	if (avformat_open_input(&pFormatCtx, file, NULL, NULL) < 0)
+	{
 		free_resources();
 		throw std::runtime_error("Can't open file");
 	}
-	if (avformat_find_stream_info(pFormatCtx, NULL)<0) {
+	if (avformat_find_stream_info(pFormatCtx, NULL)<0)
+	{
 		free_resources();
 		throw std::runtime_error("Multimedia type not supported");
 	}
@@ -42,35 +53,42 @@ out_height(_out_height), pFormatCtx(NULL), pCodecCtx(NULL), pCodec(NULL), pFrame
 	av_dump_format(pFormatCtx, 0, file, false);
 
 	// find video stream (first)
-	for (unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
-		if (AVMEDIA_TYPE_VIDEO == pFormatCtx->streams[i]->codec->codec_type) {
-				videoStream=i;
-				break;
+	for (unsigned int i=0; i<pFormatCtx->nb_streams; i++)
+	{
+		if (AVMEDIA_TYPE_VIDEO == pFormatCtx->streams[i]->codec->codec_type)
+		{
+			videoStream=i;
+			break;
 		}
 	}
-	if (-1==videoStream) {
+	if (-1==videoStream)
+	{
 		free_resources();
 		throw std::runtime_error("Can't find video stream");
 	}
 	// Get a pointer to the codec context for the video stream
 	pCodecCtx=pFormatCtx->streams[videoStream]->codec;
 	pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
-	if(!pCodec) {
+	if(!pCodec)
+	{
 		free_resources();
 		throw std::runtime_error("Can't find codec for video stream");
 	}
-	if(avcodec_open2(pCodecCtx, pCodec, NULL)<0) {
+	if(avcodec_open2(pCodecCtx, pCodec, NULL) < 0)
+	{
 		free_resources();
 		throw std::runtime_error("Can't open codec for video stream");
 	}
 	// alloacate data to extract frames
 	pFrame = avcodec_alloc_frame();
-	if (!pFrame) {
+	if (!pFrame)
+	{
 		free_resources();
 		throw std::runtime_error("Can't allocated frame for video stream");
 	}
 	// populate the out_width/out_height members
-	if (out_width > 0 && out_height > 0) {
+	if (out_width > 0 && out_height > 0)
+	{
 		LOG_INFO << "Output frame size for (" << file << ") is: " << out_width << 'x' << out_height << std::endl;
 	} else if (-1 == out_width && -1 == out_height) {
 		out_width = pCodecCtx->width;
@@ -85,23 +103,27 @@ out_height(_out_height), pFormatCtx(NULL), pCodecCtx(NULL), pCodec(NULL), pFrame
 		LOG_WARNING << "Video (" << file <<") will get scaled: " << pCodecCtx->width << 'x' << pCodecCtx->height << " (in), " << out_width << 'x' << out_height << " (out)" << std::endl;
 
 	img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, out_width, out_height, PIX_FMT_RGB24, SWS_BICUBIC, NULL, NULL, NULL);
-	if (!img_convert_ctx) {
+	if (!img_convert_ctx)
+	{
 		free_resources();
 		throw std::runtime_error("Can't allocated sw_scale context");
 	}
 }
 
-qav::scr_size qav::qvideo::get_size(void) const {
+qav::scr_size qav::qvideo::get_size(void) const
+{
 	return scr_size(out_width, out_height);
 }
 
-int qav::qvideo::get_fps_k(void) const {
+int qav::qvideo::get_fps_k(void) const
+{
 	if (pFormatCtx->streams[videoStream]->avg_frame_rate.den)
 		return 1000*pFormatCtx->streams[videoStream]->avg_frame_rate.num/pFormatCtx->streams[videoStream]->avg_frame_rate.den;
 	return 0;
 }
 
-bool qav::qvideo::get_frame(std::vector<unsigned char>& out, int *_frnum, const bool skip) {
+bool qav::qvideo::get_frame(std::vector<unsigned char>& out, int *_frnum, const bool skip)
+{
 	out.resize(avpicture_get_size(PIX_FMT_RGB24, out_width, out_height));
 	AVPacket	packet;
 	bool		is_read = false;
@@ -156,7 +178,8 @@ bool qav::qvideo::get_frame(std::vector<unsigned char>& out, int *_frnum, const 
 	return true;
 }*/
 
-void qav::qvideo::save_frame(const unsigned char *buf, const char* __fname) {
+void qav::qvideo::save_frame(const unsigned char *buf, const char* __fname)
+{
 	FILE 		*pFile;
 	std::string	s_fname;
 	char		num_buf[32];
@@ -182,24 +205,30 @@ void qav::qvideo::save_frame(const unsigned char *buf, const char* __fname) {
 	fclose(pFile);
 }
 
-qav::qvideo::~qvideo() {
+qav::qvideo::~qvideo()
+{
 	free_resources();
 }
 
-void qav::qvideo::free_resources(void) {
-	if (img_convert_ctx) {
+void qav::qvideo::free_resources(void)
+{
+	if (img_convert_ctx)
+	{
 		sws_freeContext(img_convert_ctx);
 		img_convert_ctx = 0;
 	}
-	if (pFrame) {
+	if (pFrame)
+	{
 		av_free(pFrame);
 		pFrame = 0;
 	}
-	if (pCodecCtx) {
+	if (pCodecCtx)
+	{
 		avcodec_close(pCodecCtx);
 		pCodecCtx = 0;
 	}
-	if (pFormatCtx) {
+	if (pFormatCtx)
+	{
 		avformat_close_input(&pFormatCtx);
 		pFormatCtx = 0;
 	}
