@@ -50,7 +50,10 @@ qav::qvideo::qvideo(const char* file, int _out_width, int _out_height)
 		throw std::runtime_error("Multimedia type not supported");
 	}
 	LOG_INFO << "File info for (" << file << ")" << std::endl;
-	av_dump_format(pFormatCtx, 0, file, false);
+	if( settings::LOG >= LEVEL_LOG_INFO)
+	{
+		av_dump_format(pFormatCtx, 0, file, false);
+	}
 
 	// find video stream (first)
 	for (unsigned int i=0; i<pFormatCtx->nb_streams; i++)
