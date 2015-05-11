@@ -52,56 +52,6 @@ namespace mt {
 		const std::string	_what;
 	};
 
-	class Semaphore
-	{
-		Semaphore(const Semaphore&);
-		Semaphore& operator=(const Semaphore&);
-	public:
-		Semaphore(const std::string& name)
-		{
-			_sem = sem_open( name.c_str(), O_CREAT, 777, 777 );
-			if ((void*)_sem == SEM_FAILED)
-			{
-				throw mt_exception("Semaphore: Unable to create semaphore()");
-			}
-			//std::cout << "create Semaphore " << name << " " << _sem << std::endl;
-		}
-
-		void push(void)
-		{
-
-			//std::cout << "PUSH Semaphore" << std::endl;
-			if (0 != sem_wait(_sem))
-				throw mt_exception("Sempahore: push");
-		}
-
-		bool trypush(void)
-		{
-			if (0 == sem_trywait(_sem)) {
-				return true;
-			} else if (errno == EAGAIN) {
-				return false;
-			}
-			throw mt_exception("Semaphore: trywait");
-		}
-
-		void pop(void)
-		{
-			//std::cout << "POP Semaphore" << std::endl;
-			if (0 != sem_post(_sem))
-				throw mt_exception("Sempahore: pop");
-		}
-		
-		~Semaphore()
-		{
-			//std::cout << "delete " << std::endl;
-			//sem_destroy(_sem);
-			sem_close(_sem);
-		}
-	private:
-		sem_t* _sem;
-	};
-
 	class Mutex {
 		pthread_mutex_t	_mtx;
 
@@ -183,11 +133,11 @@ namespace mt {
 		{
 		public:
 			Job(const std::string& name, const bool& to_be_deleted = false)
-				: _sem( name )
-				, _on_hold(true)
+				// : _sem( name )
+				: _on_hold(true)
 				, _to_be_deleted(to_be_deleted)
 			{
-				_sem.push();
+				// _sem.push();
 			}
 
 			virtual void run(void) = 0;
@@ -205,16 +155,16 @@ namespace mt {
 			// will ask to wait again...
 			void wait(void)
 			{
-				_sem.push();
-				_sem.pop();
+				// _sem.push();
+				// _sem.pop();
 			};
 
 			bool is_running(void)
 			{
 				if (_on_hold) return false;
-				if (false == _sem.trypush())
-					return true;
-				_sem.pop();
+				// if (false == _sem.trypush())
+				// 	return true;
+				// _sem.pop();
 				return false;
 			}
 
@@ -224,7 +174,7 @@ namespace mt {
 
 		private:
 			friend class ThreadPool;
-			Semaphore _sem;
+			// Semaphore _sem;
 			volatile bool _on_hold;
 			const bool _to_be_deleted;
 		};
@@ -251,7 +201,7 @@ namespace mt {
 				while(true)
 				{
 					// first push on the semaphore
-					p->_list_sem.push();
+					// p->_list_sem.push();
 					// check if we have to quit
 					if (p->_tp_quit) return 0;
 					// get an element to process
@@ -274,7 +224,7 @@ namespace mt {
 						// to let the user know because this means that
 						// the semaphore is not valid anymore...this should
 						// never happen...
-						curJob->_sem.pop();
+						// curJob->_sem.pop();
 						// if it has to be deleted do it!
 						if (delete_job) delete curJob;
 					}
@@ -295,8 +245,8 @@ namespace mt {
 		// so when you run in debug mode you can have exceptions thrown on
 		// push because of system interrruption! Don't get scared!
 		ThreadPool(const unsigned int& n_execs)
-			: _list_sem( "ThreadPool")
-			, _tp_quit(false)
+			// : _list_sem( "ThreadPool")
+			: _tp_quit(false)
 			, _n_execs(n_execs)
 			, _th_ids(n_execs)
 		{
@@ -316,14 +266,14 @@ namespace mt {
 		{
 			ScopedLock _sl(_list_mtx);
 			_list_jobs.push_back(job);
-			_list_sem.pop();
+			// _list_sem.pop();
 		}
 
 		~ThreadPool()
 		{
 			_tp_quit = true;
-			for (unsigned int i = 0; i < _n_execs; ++i)
-				_list_sem.pop();
+			// for (unsigned int i = 0; i < _n_execs; ++i)
+			// 	_list_sem.pop();
 			for (unsigned int i = 0; i < _n_execs; ++i)
 				pthread_join(_th_ids[i], NULL);
 			// potentialy unsafe...this could throw...but should never...
@@ -339,7 +289,7 @@ namespace mt {
 
 	private:
 		Mutex		_list_mtx;
-		Semaphore	_list_sem;
+		// Semaphore	_list_sem;
 		std::list<Job*>	_list_jobs;
 
 		// the following variable is not mutex
