@@ -30,9 +30,6 @@ private:
 	std::vector<qav::qvideo*> _videos;
 
 	stats::s_base* _analyzer;
-
-	const size_t _width;
-	const size_t _height;
 };
 
 #endif

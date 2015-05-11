@@ -12,8 +12,6 @@ Qpsnr::Qpsnr(const std::string& outputFilename, const std::string& reference, co
 	: _outputFile( outputFilename.c_str(), std::ofstream::out )
 	, _referenceVideo( reference.c_str(), width, height )
 	, _analyzer ( NULL )
-	, _width( width )
-	, _height( height )
 {
 }
 
