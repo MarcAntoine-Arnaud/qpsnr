@@ -187,10 +187,10 @@ namespace stats {
 		double &_res;
 	};
 
-	static void get_psnr_tp(const VUCHAR& ref, const std::vector<bool>& v_ok, const std::vector<VUCHAR>& streams, std::vector<double>& res) {
-		const unsigned int 			sz = v_ok.size();
-		std::vector<shared_ptr<psnr_job> >	v_jobs;
-		for(unsigned int i =0; i < sz; ++i) {
+	static void get_psnr_tp(const VUCHAR& ref, const std::vector<bool>& v_ok, const std::vector<VUCHAR>& streams, std::vector<double>& res) 
+	{
+		for(size_t i =0; i < v_ok.size(); ++i)
+		{
 			psnr_job* job = new psnr_job(&ref[0], &(streams[i][0]), ref.size(), res[i]);
 			job->run();
 		}
