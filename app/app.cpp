@@ -3,6 +3,7 @@
 #include "settings.h"
 
 #include <iostream>
+#include <stdexcept>
 #include <getopt.h>
 
 const std::string __qpsnr__ = "qpsnr";
