@@ -1,6 +1,7 @@
 
 import os
 import distutils.sysconfig
+
 Import( 'env' )
 
 Import( 'qpsnrLib' )

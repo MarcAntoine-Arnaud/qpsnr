@@ -1,24 +1,6 @@
 
 Import( 'env' )
-
-conf = Configure(env)
-if not conf.CheckLibWithHeader('avutil', 'libavutil/avutil.h', 'c'):
-	print 'Did not find libavutil.a or avutil.lib, exiting!'
-	Exit(1)
-
-if not conf.CheckLibWithHeader('avcodec', 'libavcodec/avcodec.h', 'c'):
-	print 'Did not find libavcodec.a or avcodec.lib, exiting!'
-	Exit(1)
-
-if not conf.CheckLibWithHeader('avformat', 'libavformat/avformat.h', 'c'):
-	print 'Did not find libavformat.a or avformat.lib, exiting!'
-	Exit(1)
-
-if not conf.CheckLibWithHeader('swscale', 'libswscale/swscale.h', 'c'):
-	print 'Did not find libswscale.a or swscale.lib, exiting!'
-	Exit(1)
-
-env = conf.Finish()
+Import( 'envPy' )
 
 qpsnrLib = env.SharedLibrary(
 	'qpsnr',
@@ -42,8 +24,22 @@ qpsnrLibStatic = env.StaticLibrary(
 	],
 )
 
+pythonQpsnr = envPy.SharedLibrary(
+	'pyQpsnr',
+	source='qpsnr.i',
+	LIBS=[
+		qpsnrLib,
+		'avutil',
+		'avcodec',
+		'avformat',
+		'swscale',
+		'python',
+	],
+)
+
 env.Alias( 'install', env.InstallVersionedLib( 'lib', qpsnrLib ) )
 env.Alias( 'install', env.Install( 'lib', qpsnrLibStatic ) )
+env.Alias( "install", env.InstallVersionedLib( 'lib', pythonQpsnr ) )
 
 Export( 'qpsnrLib' )
 Export( 'qpsnrLibStatic' )
