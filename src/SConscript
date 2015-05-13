@@ -37,9 +37,15 @@ pythonQpsnr = envPy.SharedLibrary(
 	],
 )
 
+Command("__init__.py", None, [ Touch("$TARGET"), ])
+
 env.Alias( 'install', env.InstallVersionedLib( 'lib', qpsnrLib ) )
 env.Alias( 'install', env.Install( 'lib', qpsnrLibStatic ) )
 env.Alias( "install", env.InstallVersionedLib( 'lib', pythonQpsnr ) )
+
+env.Alias( "install", env.Install( "include" , 'qpsnr.hpp' ) )
+env.Alias( "install", env.Install( "lib/python2.7/site-packages/qpsnr", Glob( 'qpsnr.py' ) ) )
+env.Alias( "install", env.Install( "lib/python2.7/site-packages/qpsnr", "__init__.py" ) )
 
 Export( 'qpsnrLib' )
 Export( 'qpsnrLibStatic' )
