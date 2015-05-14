@@ -325,7 +325,7 @@ namespace stats {
 	class psnr : public s_base {
 	protected:
 		void print(const int& ref_frame, const std::vector<double>& v_res) {
-			_ostr << "<frame index=" << ref_frame << ">";
+			_ostr << "<frame index=\"" << ref_frame << "\">";
 			for(int i = 0; i < _n_streams; ++i)
 				_ostr << "<result>" << v_res[i] << "</result>";
 			_ostr << "</frame>" << std::endl;
@@ -447,7 +447,7 @@ namespace stats {
 		int	_blocksize;
 
 		void print(const int& ref_frame, const std::vector<double>& v_res) {
-			_ostr << "<frame index=" << ref_frame << ">";
+			_ostr << "<frame index=\"" << ref_frame << "\">";
 			for(int i = 0; i < _n_streams; ++i)
 				_ostr << "<result>" << v_res[i] << "</result>";
 			_ostr << "</frame>" << std::endl;

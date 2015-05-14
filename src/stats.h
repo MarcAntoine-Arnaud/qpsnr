@@ -41,7 +41,7 @@ namespace stats {
 			, _i_height(i_height)
 			, _ostr(ostr)
 		{
-			_ostr << "<analyse type=" << analyseType << ">" << std::endl;
+			_ostr << "<analyse type=\"" << analyseType << "\">" << std::endl;
 		}
 
 		virtual void set_parameter(const std::string& p_name, const std::string& p_value) = 0;
