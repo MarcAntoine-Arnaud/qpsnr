@@ -4,6 +4,8 @@
 %include "std_vector.i"
 %include "std_map.i"
 
+%include "stdExceptions.i"
+
 %{
 #include <qpsnr.hpp>
 %}
