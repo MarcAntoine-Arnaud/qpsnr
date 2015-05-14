@@ -146,4 +146,4 @@ private:
 	count_type	*_count;
 };
 
-#endif //_SHARED_PTR_H_
+#endif

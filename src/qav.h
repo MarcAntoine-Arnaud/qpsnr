@@ -72,5 +72,4 @@ namespace qav {
 }
 
 
-#endif /*_QAV_H_*/
-
+#endif

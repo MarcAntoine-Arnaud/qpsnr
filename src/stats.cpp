@@ -145,31 +145,31 @@ namespace stats {
 		}
 	}
 
-	static int getCPUcount(void) {
-			std::ifstream		cpuinfo("/proc/cpuinfo");
-			std::string		line;
-			std::set<std::string>	IDs;
-			while (cpuinfo){
-				std::getline(cpuinfo,line);
-				if (line.empty())
-						continue;
-				if (line.find("processor") != 0)
-						continue;
-				IDs.insert(line);
-			}
-		if (IDs.empty()) return 1;
-			return IDs.size();
-	}
+	// static int getCPUcount(void) {
+	// 		std::ifstream		cpuinfo("/proc/cpuinfo");
+	// 		std::string		line;
+	// 		std::set<std::string>	IDs;
+	// 		while (cpuinfo){
+	// 			std::getline(cpuinfo,line);
+	// 			if (line.empty())
+	// 					continue;
+	// 			if (line.find("processor") != 0)
+	// 					continue;
+	// 			IDs.insert(line);
+	// 		}
+	// 	if (IDs.empty()) return 1;
+	// 		return IDs.size();
+	// }
 
-	static mt::ThreadPool	__stats_tp(getCPUcount());
+	//static mt::ThreadPool	__stats_tp(getCPUcount());
 
 	class psnr_job
-		: public mt::ThreadPool::Job
+		//: public mt::ThreadPool::Job
 	{
 	public:
 		psnr_job(const unsigned char *ref, const unsigned char *cmp, const unsigned int& sz, double& res)
-			: mt::ThreadPool::Job("PSNR")
-			, _ref(ref)
+			//: mt::ThreadPool::Job("PSNR")
+			: _ref(ref)
 			, _cmp(cmp)
 			, _sz(sz)
 			, _res(res)
@@ -196,7 +196,7 @@ namespace stats {
 		}
 	}
 
-	class ssim_job : public mt::ThreadPool::Job
+	class ssim_job// : public mt::ThreadPool::Job
 	{
 	public:
 		ssim_job(
@@ -206,8 +206,8 @@ namespace stats {
 				const unsigned int& y,
 				const unsigned int b_sz,
 				double& res )
-			: mt::ThreadPool::Job("SSIM")
-			, _ref(ref)
+			//: mt::ThreadPool::Job("SSIM")
+			: _ref(ref)
 			, _cmp(cmp)
 			, _x(x)
 			, _y(y)
@@ -239,12 +239,12 @@ namespace stats {
 	}
 
 	class hsi_job
-		: public mt::ThreadPool::Job
+		//: public mt::ThreadPool::Job
 	{
 	public:
 		hsi_job(unsigned char *buf, const unsigned int& sz)
-			: mt::ThreadPool::Job("HSI")
-			, _buf(buf)
+			//: mt::ThreadPool::Job("HSI")
+			: _buf(buf)
 			, _sz(sz)
 		{
 		}
@@ -258,12 +258,12 @@ namespace stats {
 		const unsigned int _sz;
 	};
 
-	class YCbCr_job : public mt::ThreadPool::Job
+	class YCbCr_job //: public mt::ThreadPool::Job
 	{
 	public:
 		YCbCr_job(unsigned char *buf, const unsigned int& sz)
-			: mt::ThreadPool::Job("YCbCr")
-			, _buf(buf)
+			//: mt::ThreadPool::Job("YCbCr")
+			: _buf(buf)
 			, _sz(sz)
 		{
 		}
@@ -277,11 +277,12 @@ namespace stats {
 		const unsigned int _sz;
 	};
 
-	class Y_job : public mt::ThreadPool::Job {
+	class Y_job //: public mt::ThreadPool::Job
+	{
 	public:
 		Y_job(unsigned char *buf, const unsigned int& sz)
-			: mt::ThreadPool::Job("Y")
-			, _buf(buf)
+			//: mt::ThreadPool::Job("Y")
+			: _buf(buf)
 			, _sz(sz)
 		{
 		}

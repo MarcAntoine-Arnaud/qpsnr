@@ -65,5 +65,5 @@ namespace stats {
 		std::ostream& ostr);
 }
 
-#endif /*_STATS_H_*/
+#endif
 

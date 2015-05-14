@@ -48,5 +48,5 @@ namespace settings {
 }
 
 
-#endif /*_SETTINGS_H_*/
+#endif
 
