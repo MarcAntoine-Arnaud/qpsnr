@@ -17,7 +17,9 @@ if not ( buildMode in [ 'debug', 'release' ] ) :
 
 env = Environment()
 env.Append(
-	CPPPATH = [ '/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7' ]
+	CPPPATH = [
+		'/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7'
+	]
 )
 
 envPy = env.Clone()
@@ -67,6 +69,7 @@ env.Append(
 envPy.Replace(
     SWIGCXXFILESUFFIX= '_wrapPython$CXXFILESUFFIX',
     SHLIBPREFIX= '_',
+    SHLIBSUFFIX= '.so',
     CXXFLAGS = [
         '-Wall',
     ],
