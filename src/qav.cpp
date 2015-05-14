@@ -33,6 +33,8 @@ qav::qvideo::qvideo(const char* file, int _out_width, int _out_height)
 	, pFrame(NULL)
 	, img_convert_ctx(NULL)
 {
+	av_register_all();
+
 	const char* pslash = strrchr(file, '/');
 	if (pslash)
 		fname = pslash+1;

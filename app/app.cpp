@@ -202,9 +202,6 @@ int main(int argc, char *argv[])
 {
 		std::map<std::string, std::string>	aoptions;
 		const int param = parse_options(argc, argv, aoptions);
-		
-		// Register all formats and codecs
-		av_register_all();
 
 		if (settings::REF_VIDEO == "")
 			throw std::runtime_error("Reference video not specified");
