@@ -2,26 +2,23 @@
 Import( 'env' )
 Import( 'envPy' )
 
+ffmpegDependencies = [
+	"avutil",
+	"avcodec",
+	"avformat",
+	"swscale",
+]
+
 qpsnrLib = env.SharedLibrary(
 	'qpsnr',
 	Glob( '*.cpp' ),
-	LIBS = [
-		"avutil",
-		"avcodec",
-		"avformat",
-		"swscale",
-	],
+	LIBS = ffmpegDependencies,
 )
 
 qpsnrLibStatic = env.StaticLibrary(
 	'qpsnr',
 	Glob( '*.cpp' ),
-	LIBS = [
-		"avutil",
-		"avcodec",
-		"avformat",
-		"swscale",
-	],
+	LIBS = ffmpegDependencies,
 )
 
 pythonQpsnr = envPy.SharedLibrary(
@@ -29,12 +26,8 @@ pythonQpsnr = envPy.SharedLibrary(
 	source='qpsnr.i',
 	LIBS=[
 		qpsnrLib,
-		'avutil',
-		'avcodec',
-		'avformat',
-		'swscale',
-		'python',
-	],
+		"python"
+	] + ffmpegDependencies
 )
 
 Command("__init__.py", None, [ Touch("$TARGET"), ])
