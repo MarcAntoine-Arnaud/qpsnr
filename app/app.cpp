@@ -200,25 +200,29 @@ int parse_options(int argc, char *argv[], std::map<std::string, std::string>& ao
 
 int main(int argc, char *argv[])
 {
-		std::map<std::string, std::string>	aoptions;
-		const int param = parse_options(argc, argv, aoptions);
+	std::map<std::string, std::string>	aoptions;
+	const int param = parse_options(argc, argv, aoptions);
 
-		if (settings::REF_VIDEO == "")
-			throw std::runtime_error("Reference video not specified");
+	if (settings::REF_VIDEO == "")
+	{
+		std::cerr << "[ERROR] Reference video not specified" << std::endl;
+		std::cerr << std::endl;
+		print_help();
+	}
 		
-		Qpsnr comparator( "result.xml", settings::REF_VIDEO.c_str(), settings::VIDEO_SIZE_W, settings::VIDEO_SIZE_H );
+	Qpsnr comparator( "result.xml", settings::REF_VIDEO.c_str(), settings::VIDEO_SIZE_W, settings::VIDEO_SIZE_H );
 
-		for(int i = param; i < argc; ++i)
-		{
-			comparator.addVideo( argv[i] );
-		}
+	for(int i = param; i < argc; ++i)
+	{
+		comparator.addVideo( argv[i] );
+	}
 
-		// print some infos
-		//LOG_INFO << "Skip frames: " << ((settings::SKIP_FRAMES > 0) ? settings::SKIP_FRAMES : 0) << std::endl;
-		//LOG_INFO << "Max frames: " << ((settings::MAX_FRAMES > 0) ? settings::MAX_FRAMES : 0) << std::endl;
-		// create the stats analyzer (like the psnr)
-		LOG_INFO << "Analyzer set: " << settings::ANALYZER << std::endl;
-		comparator.initAnalyser( settings::ANALYZER.c_str(), aoptions );
+	// print some infos
+	//LOG_INFO << "Skip frames: " << ((settings::SKIP_FRAMES > 0) ? settings::SKIP_FRAMES : 0) << std::endl;
+	//LOG_INFO << "Max frames: " << ((settings::MAX_FRAMES > 0) ? settings::MAX_FRAMES : 0) << std::endl;
+	// create the stats analyzer (like the psnr)
+	LOG_INFO << "Analyzer set: " << settings::ANALYZER << std::endl;
+	comparator.initAnalyser( settings::ANALYZER.c_str(), aoptions );
 		
-		comparator.process();
+	comparator.process();
 }
