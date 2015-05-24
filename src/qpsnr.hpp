@@ -21,7 +21,7 @@ public:
 
 	void initAnalyser( const std::string& analyser, const std::map<std::string, std::string>& options );
 
-	size_t processFrame();
+	bool processFrame( int& processedFrameIndex );
 	void process();
 
 private:

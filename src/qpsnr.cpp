@@ -72,36 +72,51 @@ void Qpsnr::initAnalyser( const std::string& analyser, const std::map<std::strin
 	}
 }
 
-size_t Qpsnr::processFrame()
+bool Qpsnr::processFrame( int& processedFrameIndex )
 {
 	bool skip = false;
-	int frameNumber = 0;
 	std::vector<unsigned char> referenceFrameBuffer;
 	std::vector<std::vector<unsigned char> > videoFrameBuffer(_videos.size());
 
-	_referenceVideo.get_frame(referenceFrameBuffer, &frameNumber, skip);
-
+	bool readedFrame = _referenceVideo.get_frame(referenceFrameBuffer, &processedFrameIndex, skip);
+	if( ! readedFrame ){
+		return false;
+	}
 	for( size_t streamIndex = 0; streamIndex < _videos.size(); ++streamIndex)
 	{
-		_videos.at(streamIndex)->get_frame(videoFrameBuffer.at(streamIndex), &frameNumber, skip);
+		bool readedFrame = _videos.at(streamIndex)->get_frame(videoFrameBuffer.at(streamIndex), &processedFrameIndex, skip);
+		if( ! readedFrame ){
+			return false;
+		}
 	}
+	
+	if(_videos.size() == 0){
+		return false;
+	}
+
 	std::vector<bool> v_ok(_videos.size());
 
 	_analyzer->process(
-			frameNumber,
+			processedFrameIndex,
 			referenceFrameBuffer,
 			v_ok,
 			videoFrameBuffer
 	);
-	return frameNumber;
+	return true;
 }
 
 void Qpsnr::process()
 {
 	while(1)
 	{
-		size_t processedFrameIndex = processFrame();
+		int processedFrameIndex = 0;
+		if( ! processFrame( processedFrameIndex ) )
+		{
+			break;
+		}
+
 		std::cerr << "\r Process frame " << processedFrameIndex << std::flush;
+		
 		if( processedFrameIndex == settings::MAX_FRAMES )
 		{
 			break;
