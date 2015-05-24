@@ -13,7 +13,8 @@ class Qpsnr
 {
 
 public:
-	Qpsnr(const std::string& outputFilename, const std::string& reference, const size_t width, const size_t height);
+	Qpsnr(const std::string& outputFilename, const std::string& reference );
+	Qpsnr(const std::string& outputFilename, const std::string& reference, const size_t width, const size_t height );
 	~Qpsnr();
 
 	void addVideo( const std::string& video );

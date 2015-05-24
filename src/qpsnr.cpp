@@ -8,6 +8,13 @@
 #include <sstream>
 #include <fstream>
 
+Qpsnr::Qpsnr(const std::string& outputFilename, const std::string& reference)
+	: _outputFile( outputFilename.c_str(), std::ofstream::out )
+	, _referenceVideo( reference.c_str() )
+	, _analyzer ( NULL )
+{
+}
+
 Qpsnr::Qpsnr(const std::string& outputFilename, const std::string& reference, const size_t width, const size_t height)
 	: _outputFile( outputFilename.c_str(), std::ofstream::out )
 	, _referenceVideo( reference.c_str(), width, height )
