@@ -25,7 +25,7 @@ pythonQpsnr = envPy.SharedLibrary(
 	'qpsnr',
 	source='qpsnr.i',
 	LIBS=[
-		qpsnrLib,
+		qpsnrLibStatic,
 		"python"
 	] + ffmpegDependencies
 )
