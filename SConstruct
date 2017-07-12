@@ -43,9 +43,11 @@ if not conf.CheckLibWithHeader('swscale', 'libswscale/swscale.h', 'c'):
     Exit(1)
 
 python_lib_name = 'python'
+python_inc_dir = ''
 if not conf.CheckLibWithHeader('python', 'Python.h', 'c'):
-    if conf.CheckLibWithHeader('python2.7', 'Python.h', 'c'):
+    if conf.CheckLibWithHeader('python2.7', 'python2.7/Python.h', 'c'):
         python_lib_name = 'python2.7'
+        python_inc_dir = '/usr/include/python2.7'
     else:
         print 'Did not find libpython.a or python.lib, exiting!'
         Exit(1)
@@ -55,6 +57,7 @@ env = conf.Finish()
 env.Append(
     CPPPATH = [
         '#src',
+        python_inc_dir,
     ],
     CXXFLAGS = [
         '-Wall',
@@ -64,7 +67,8 @@ env.Append(
         '-DQPSNR_VERSION_MICRO=' + qpsnrVersionMicro,
     ],
     LIBPATH = [
-        '#src'
+        '#src',
+        python_inc_dir,
     ],
     SHLIBVERSION = qpsnrVersionStr,
     )
@@ -86,12 +90,14 @@ envPy.Replace(
     ],
     LIBPATH = [
         "#src",
+        python_inc_dir,
     ],
 )
 
 envPy.Append(
     CPPPATH = [
         "#src",
+        python_inc_dir,
     ],
     SWIGPATH = envPy['CPPPATH']
 )
