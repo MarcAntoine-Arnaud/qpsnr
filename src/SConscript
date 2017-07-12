@@ -1,44 +1,45 @@
 
-Import( 'env' )
-Import( 'envPy' )
+Import('env')
+Import('envPy')
+Import('python_lib_name')
 
 ffmpegDependencies = [
-	"avutil",
-	"avcodec",
-	"avformat",
-	"swscale",
+    "avutil",
+    "avcodec",
+    "avformat",
+    "swscale",
 ]
 
 qpsnrLib = env.SharedLibrary(
-	'qpsnr',
-	Glob( '*.cpp' ),
-	LIBS = ffmpegDependencies,
+    'qpsnr',
+    Glob( '*.cpp' ),
+    LIBS = ffmpegDependencies,
 )
 
 qpsnrLibStatic = env.StaticLibrary(
-	'qpsnr',
-	Glob( '*.cpp' ),
-	LIBS = ffmpegDependencies,
+    'qpsnr',
+    Glob( '*.cpp' ),
+    LIBS = ffmpegDependencies,
 )
 
 pythonQpsnr = envPy.SharedLibrary(
-	'qpsnr',
-	source='qpsnr.i',
-	LIBS=[
-		qpsnrLibStatic,
-		"python"
-	] + ffmpegDependencies
+    'qpsnr',
+    source='qpsnr.i',
+    LIBS=[
+        qpsnrLibStatic,
+        python_lib_name
+    ] + ffmpegDependencies
 )
 
 Command("__init__.py", None, [ Touch("$TARGET"), ])
 
-env.Alias( 'install', env.InstallVersionedLib( 'lib', qpsnrLib ) )
-env.Alias( 'install', env.Install( 'lib', qpsnrLibStatic ) )
+env.Alias('install', env.InstallVersionedLib('lib', qpsnrLib))
+env.Alias('install', env.Install('lib', qpsnrLibStatic))
 
-env.Alias( "install", env.Install( "include" , 'qpsnr.hpp' ) )
-env.Alias( "install", env.Install( "lib/python2.7/site-packages/qpsnr", pythonQpsnr ) )
-env.Alias( "install", env.Install( "lib/python2.7/site-packages/qpsnr", Glob( 'qpsnr.py' ) ) )
-env.Alias( "install", env.Install( "lib/python2.7/site-packages/qpsnr", "__init__.py" ) )
+env.Alias('install', env.Install('include', 'qpsnr.hpp'))
+env.Alias('install', env.Install('lib/python2.7/site-packages/qpsnr', pythonQpsnr))
+env.Alias('install', env.Install('lib/python2.7/site-packages/qpsnr', Glob('qpsnr.py')))
+env.Alias('install', env.Install('lib/python2.7/site-packages/qpsnr', "__init__.py"))
 
-Export( 'qpsnrLib' )
-Export( 'qpsnrLibStatic' )
+Export('qpsnrLib')
+Export('qpsnrLibStatic')
