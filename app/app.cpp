@@ -70,10 +70,11 @@ int parse_options(int argc, char *argv[], std::map<std::string, std::string>& ao
 		{"ignore-fps", no_argument, 0, 'G'},
 		{"help", no_argument, 0, 'h'},
 		{"aopts", required_argument, 0, 'o'},
+		{"json", required_argument, 0, 'j'},
 		{0, 0, 0, 0}
 	};
 
-	while ((c = getopt_long (argc, argv, "a:l:m:o:r:s:v:hIG", long_options, &option_index)) != -1) {
+	while ((c = getopt_long (argc, argv, "a:j:l:m:o:r:s:v:hIG", long_options, &option_index)) != -1) {
 		switch (c) {
 			case 'a':
 			{
@@ -154,6 +155,9 @@ int parse_options(int argc, char *argv[], std::map<std::string, std::string>& ao
 			case 'I':
 				settings::SAVE_IMAGES = true;
 				break;
+			case 'j':
+				settings::OUTPUT = optarg;
+				break;
 			case 'G':
 				settings::IGNORE_FPS = true;
 				break;
@@ -209,8 +213,13 @@ int main(int argc, char *argv[])
 		std::cerr << std::endl;
 		print_help();
 	}
-		
-	Qpsnr comparator( "result.xml", settings::REF_VIDEO.c_str(), settings::VIDEO_SIZE_W, settings::VIDEO_SIZE_H );
+
+	std::string output = settings::OUTPUT;
+	if(settings::OUTPUT == ""){
+		output = "result.json";
+	}
+
+	Qpsnr comparator(output, settings::REF_VIDEO.c_str(), settings::VIDEO_SIZE_W, settings::VIDEO_SIZE_H );
 
 	for(int i = param; i < argc; ++i)
 	{

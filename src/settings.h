@@ -42,6 +42,7 @@ namespace settings {
 	extern int         SKIP_FRAMES;
 	extern bool        SAVE_IMAGES;
 	extern std::string ANALYZER;
+	extern std::string OUTPUT;
 	extern bool        IGNORE_FPS;
 	extern int         VIDEO_SIZE_W;
 	extern int         VIDEO_SIZE_H;

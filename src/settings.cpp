@@ -26,6 +26,7 @@ namespace settings {
 	int         SKIP_FRAMES = -1;
 	bool        SAVE_IMAGES = false;
 	std::string ANALYZER = "psnr";
+	std::string OUTPUT = "result.json";
 	bool        IGNORE_FPS = false;
 	int         VIDEO_SIZE_W = -1;
 	int         VIDEO_SIZE_H = -1;

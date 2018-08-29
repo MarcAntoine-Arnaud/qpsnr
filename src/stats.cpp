@@ -326,10 +326,19 @@ namespace stats {
 	class psnr : public s_base {
 	protected:
 		void print(const int& ref_frame, const std::vector<double>& v_res) {
-			_ostr << "<frame index=\"" << ref_frame << "\">";
+			if(_first_frame)
+			{
+				_first_frame = false;
+			} else {
+				_ostr << ",";
+			}
+
+			_ostr << "{\"index\": " << ref_frame << ", \"result\": [";
 			for(int i = 0; i < _n_streams; ++i)
-				_ostr << "<result>" << v_res[i] << "</result>";
-			_ostr << "</frame>" << std::endl;
+			{
+				_ostr << v_res[i] << ((i == _n_streams - 1) ? "" : ",");
+			}
+			_ostr << "]}" << std::endl;
 		}
 
 		void process_colorspace(VUCHAR& ref, const std::vector<bool>& v_ok, std::vector<VUCHAR>& streams)
@@ -448,10 +457,19 @@ namespace stats {
 		int	_blocksize;
 
 		void print(const int& ref_frame, const std::vector<double>& v_res) {
-			_ostr << "<frame index=\"" << ref_frame << "\">";
+			if(_first_frame)
+			{
+				_first_frame = false;
+			} else {
+				_ostr << ",";
+			}
+
+			_ostr << "{\"index\": " << ref_frame << ", \"result\": [";
 			for(int i = 0; i < _n_streams; ++i)
-				_ostr << "<result>" << v_res[i] << "</result>";
-			_ostr << "</frame>" << std::endl;
+			{
+				_ostr << v_res[i] << ((i == _n_streams - 1) ? "" : ",");
+			}
+			_ostr << "]}" << std::endl;
 		}
 	public:
 		ssim(const char* analyseType, const int& n_streams, const int& i_width, const int& i_height, std::ostream& ostr) :
@@ -470,7 +488,7 @@ namespace stats {
 			// convert to Y colorspace
 			rgb_2_Y_tp(ref, v_ok, streams);
 			//
-			std::vector<double>	v_res(_n_streams);
+			std::vector<double> v_res(_n_streams);
 			get_ssim_tp(ref, v_ok, streams, v_res, _i_width, _i_height, _blocksize);
 			//
 			print(ref_frame, v_res);
@@ -516,12 +534,12 @@ namespace stats {
 			// convert to Y colorspace
 			rgb_2_Y_tp(ref, v_ok, streams);
 			//
-			std::vector<double>	v_res(_n_streams);
+			std::vector<double> v_res(_n_streams);
 			get_ssim_tp(ref, v_ok, streams, v_res, _i_width, _i_height, _blocksize);
 			// accumulate for each
 			for(int i = 0; i < _n_streams; ++i) {
 				if (v_ok[i]) {
-					 _accum_v[i] += v_res[i];
+					_accum_v[i] += v_res[i];
 				} else _accum_v[i] += 0.0;
 			}
 			++_accum_f;
@@ -549,10 +567,10 @@ stats::s_base* stats::get_analyzer(
 	const int& i_height,
 	std::ostream& ostr )
 {
-	const std::string	s_id(id);
-	if (s_id == "psnr") return new psnr(id, n_streams, i_width, i_height, ostr);
+	const std::string s_id(id);
+	if      (s_id == "psnr")     return new psnr    (id, n_streams, i_width, i_height, ostr);
 	else if (s_id == "avg_psnr") return new avg_psnr(id, n_streams, i_width, i_height, ostr);
-	else if (s_id == "ssim") return new ssim(id, n_streams, i_width, i_height, ostr);
+	else if (s_id == "ssim")     return new ssim    (id, n_streams, i_width, i_height, ostr);
 	else if (s_id == "avg_ssim") return new avg_ssim(id, n_streams, i_width, i_height, ostr);
 	throw std::runtime_error("Invalid analyzer id");
 }
